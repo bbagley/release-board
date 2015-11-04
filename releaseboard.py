@@ -1,19 +1,32 @@
 """Script to get build information from Jenkins"""
 import sys
-import jenkinsapi
-from jenkinsapi.jenkins import Jenkins
+from json import JSONEncoder
+import jenkins
 
 def main():
     """Main entry point for the script."""
-    #releases = get_recent_release_job_information(URL)
-    server=get_server_instance()
-    print "Jenkins Version:"
-    print server.version
+    server = jenkins.Jenkins('http://jenkins-master-ux.awsdev.usatoday.com')
+    version = server.get_version()
+    print version
 
-    #get_job_details()
+    #views = server.get_views()
+    #print views
 
-    print jenkinsapi.api.get_view_from_url('http://jenkins-master-ux.awsdev.usatoday.com/view/Build/')
+    #prodjobs = server.get_job_info_regex('_to_production')
+    #print prodjobs
 
+    jobs = server.get_all_jobs()
+    #print jobs
+    prodJobs = {}
+
+    for job in jobs:
+        #print job['fullname']
+        if '_to_production' in job['fullname']:
+            paper = job['fullname'].split("_")[0]
+            print paper
+            prodJobs.update({paper : job})
+
+    print prodJobs
     pass
 
 def get_server_instance():
