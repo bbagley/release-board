@@ -3,17 +3,13 @@ import sys
 from json import JSONEncoder
 import jenkins
 
+sitelist = { "baxterbulletin", "argusleader", "battlecreekenquirer", "clarionledger","blackmountainnews","coshoctontribune","delmarvanow","floridatoday","greatfallstribune","greenvilleonline","hattiesburgamerican","ithacajournal","jconline","jacksonsun","mansfieldnewsjournal","marionstar","postcrescent","poughkeepsiejournal","press-citizen","sheboyganpress","shreveporttimes","thecalifornian","thedailyjournal","thehammontonnews","theleafchronicle","thenews-messenger","wisconsinrapidstribune","zanesvilletimesrecorder","thespectrum","thestarpress","thetimesherald","thetowntalk","thenorthwestern","visaliatimesdelta","wausaudailyherald","tallahassee","theadvertiser","thenewsstar","stargazette","statesmanjournal","stevenspointjournal","reno","rgj","sctimes","pnj","portclintonnewsherald","pressconnects","news-press","packersnews","pal-item","newarkadvocate","news-leader","newsleader","montgomeryadvertiser","mycentraljersey","livingstondaily","marcoislandflorida","marshfieldnewsherald","lancastereaglegazette","lansingstatejournal","lavozarizona","hawkcentral","hometownlife","htrnews","fsunews","greenbaypressgazette","guampdn","elsoldesalinas","farmersadvance","fdlreporter","dmjuice","dnj","desertsun","delawareonline","dailyrecord","dailyworld","citizen-times","coloradoan","courierpostonline","app","bucyrustelegraphforum","desmoinesregister","lohud","alamogordonews","currentargus","daily-times","demingheadlight","elpasotimes","elpasoymas","lcsun-news","ruidosonews","scsun-news","tennessean","democratandchronicle","burlingtonfreepress","centralfloridafuture","chillicothegazette","courier-journal","cincinnati","freep","indystar" }
+
 def main():
     """Main entry point for the script."""
     server = jenkins.Jenkins('http://jenkins-master-ux.awsdev.usatoday.com')
     version = server.get_version()
     print version
-
-    #views = server.get_views()
-    #print views
-
-    #prodjobs = server.get_job_info_regex('_to_production')
-    #print prodjobs
 
     jobs = server.get_all_jobs()
     #print jobs
@@ -23,10 +19,15 @@ def main():
         #print job['fullname']
         if '_to_production' in job['fullname']:
             paper = job['fullname'].split("_")[0]
-            print paper
+            #print paper
+            jobinfo = server.get_job_info(job['fullname'])
+            #print jobinfo
             prodJobs.update({paper : job})
 
-    print prodJobs
+    #print prodJobs
+
+    bax = server.get_job_info("baxterbulletin_to_production")
+    print bax
     pass
 
 def get_server_instance():
