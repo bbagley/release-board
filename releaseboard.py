@@ -2,8 +2,11 @@
 import sys
 from json import JSONEncoder
 import jenkins
+from lxml import html
+import requests
+import bs4
 
-sitelist = { "baxterbulletin", "argusleader", "battlecreekenquirer", "clarionledger","blackmountainnews","coshoctontribune","delmarvanow","floridatoday","greatfallstribune","greenvilleonline","hattiesburgamerican","ithacajournal","jconline","jacksonsun","mansfieldnewsjournal","marionstar","postcrescent","poughkeepsiejournal","press-citizen","sheboyganpress","shreveporttimes","thecalifornian","thedailyjournal","thehammontonnews","theleafchronicle","thenews-messenger","wisconsinrapidstribune","zanesvilletimesrecorder","thespectrum","thestarpress","thetimesherald","thetowntalk","thenorthwestern","visaliatimesdelta","wausaudailyherald","tallahassee","theadvertiser","thenewsstar","stargazette","statesmanjournal","stevenspointjournal","reno","rgj","sctimes","pnj","portclintonnewsherald","pressconnects","news-press","packersnews","pal-item","newarkadvocate","news-leader","newsleader","montgomeryadvertiser","mycentraljersey","livingstondaily","marcoislandflorida","marshfieldnewsherald","lancastereaglegazette","lansingstatejournal","lavozarizona","hawkcentral","hometownlife","htrnews","fsunews","greenbaypressgazette","guampdn","elsoldesalinas","farmersadvance","fdlreporter","dmjuice","dnj","desertsun","delawareonline","dailyrecord","dailyworld","citizen-times","coloradoan","courierpostonline","app","bucyrustelegraphforum","desmoinesregister","lohud","alamogordonews","currentargus","daily-times","demingheadlight","elpasotimes","elpasoymas","lcsun-news","ruidosonews","scsun-news","tennessean","democratandchronicle","burlingtonfreepress","centralfloridafuture","chillicothegazette","courier-journal","cincinnati","freep","indystar" }
+sitelist = [ "baxterbulletin", "argusleader", "battlecreekenquirer", "clarionledger","blackmountainnews","coshoctontribune","delmarvanow","floridatoday","greatfallstribune","greenvilleonline","hattiesburgamerican","ithacajournal","jconline","jacksonsun","mansfieldnewsjournal","marionstar","postcrescent","poughkeepsiejournal","press-citizen","sheboyganpress","shreveporttimes","thecalifornian","thedailyjournal","thehammontonnews","theleafchronicle","thenews-messenger","wisconsinrapidstribune","zanesvilletimesrecorder","thespectrum","thestarpress","thetimesherald","thetowntalk","thenorthwestern","visaliatimesdelta","wausaudailyherald","tallahassee","theadvertiser","thenewsstar","stargazette","statesmanjournal","stevenspointjournal","reno","rgj","sctimes","pnj","portclintonnewsherald","pressconnects","news-press","packersnews","pal-item","newarkadvocate","news-leader","newsleader","montgomeryadvertiser","mycentraljersey","livingstondaily","marcoislandflorida","marshfieldnewsherald","lancastereaglegazette","lansingstatejournal","lavozarizona","hawkcentral","hometownlife","htrnews","fsunews","greenbaypressgazette","guampdn","elsoldesalinas","farmersadvance","fdlreporter","dmjuice","dnj","desertsun","delawareonline","dailyrecord","dailyworld","citizen-times","coloradoan","courierpostonline","app","bucyrustelegraphforum","desmoinesregister","lohud","alamogordonews","currentargus","daily-times","demingheadlight","elpasotimes","elpasoymas","lcsun-news","ruidosonews","scsun-news","tennessean","democratandchronicle","burlingtonfreepress","centralfloridafuture","chillicothegazette","courier-journal","cincinnati","freep","indystar" ]
 
 def main():
     """Main entry point for the script."""
@@ -15,19 +18,20 @@ def main():
     #print jobs
     prodJobs = {}
 
-    for job in jobs:
-        #print job['fullname']
-        if '_to_production' in job['fullname']:
-            paper = job['fullname'].split("_")[0]
-            #print paper
-            jobinfo = server.get_job_info(job['fullname'])
-            #print jobinfo
-            prodJobs.update({paper : job})
+    #for job in jobs:
+        #if '_to_production' in job['fullname']:
+            #paper = job['fullname'].split("_")[0]
+            #jobinfo = server.get_job_info(job['fullname'])
+            #prodJobs.update({paper : job})
 
     #print prodJobs
 
-    bax = server.get_job_info("baxterbulletin_to_production")
-    print bax
+    #bax = server.get_job_info("baxterbulletin_to_production")
+    #print bax
+
+    ver = get_prod_server_version(sitelist[0])
+    print ver
+    
     pass
 
 def get_server_instance():
@@ -42,6 +46,15 @@ def get_recent_release_job_information(url):
 def get_latest_build_information(url):
     """Return a list build jobs with recent versions and success or failure."""
     pass
+
+def get_prod_server_version(sitekey):
+    """Return the version of the app from verison-info out in Prod"""
+    url = "http://www." + sitekey + ".com/version-info.html"
+    page = requests.get(url)
+    soup = bs4.BeautifulSoup(page.text, "lxml")
+    version = soup.select("dd")[0].get_text()
+    print version
+    return version
 
 """Get job details of each job that is running on the Jenkins instance"""
 def get_job_details():
